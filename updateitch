@@ -1,0 +1,24 @@
+#!/bin/sh
+
+echo "Clearing out .DS_Store files..."
+rm userdisk/.DS_Stor*
+rm userdisk/*/.DS_Stor*
+rm userdisk/*/*/.DS_Stor*
+
+echo
+echo "Zipping user.minidisk..."
+rm MiniMicro/StreamingAssets/user.minidisk
+cd userdisk
+zip -r ../MiniMicro/StreamingAssets/user.minidisk *
+
+echo
+echo "Preparing/uploading HTML5 build"
+cd ../MiniMicro
+rm ../archive.zip
+#rm StreamingAssets/RuntimeAudioClipLoader/explanation_*
+zip -r ../archive.zip *
+cd ..
+./butler push archive.zip joestrout/clacks:html5
+
+echo "https://joestrout.itch.io/clacks"
+open "https://joestrout.itch.io/clacks"
