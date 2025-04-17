@@ -99,7 +99,7 @@ fillPoly3d = function(points3d)
 end function
 
 trackRow = 11
-drawTrack = function()
+drawTrack = function
 	// Draw the track (at y=11, z>1)
 	y = trackRow
 	for z in range (2, 21)
@@ -110,7 +110,7 @@ drawTrack = function()
 	end for
 end function
 
-drawBin = function()
+drawBin = function
 	// Draw the bin, as a sprite so that it sorts properly
 	// with blocks falling above or into it
 	binSprite = new Sprite
@@ -123,7 +123,7 @@ drawBin = function()
 end function
 
 // sprite was created with:
-drawBinManually = function()
+drawBinManually = function
 	// Draw the sides of the bin
 	y = 0; z = -0.05
 	gfx.color = color.white
@@ -185,7 +185,7 @@ catcher.ejectTime = -999
 catcher.lights = new Sprite
 catcher.lights.update = null
 
-catcher.reset = function()
+catcher.reset = function
 	self.blocks = []
 	self.ejectTime = -999	
 	catcher.targetCol = 2
@@ -193,7 +193,7 @@ catcher.reset = function()
 	self.updateSprites
 end function
 
-catcher.canCatch = function()
+catcher.canCatch = function
 	return self.blocks.len < 5
 end function
 
@@ -207,7 +207,7 @@ catcher.catchBlock = function(block)
 	addToScore self.blocks.len
 end function
 
-catcher.ejectBlock = function()
+catcher.ejectBlock = function
 	self.ejectTime = time
 	if not self.blocks then return
 	col = round(self.col)
@@ -227,7 +227,7 @@ catcher.ejectBlock = function()
 	bin[col].push b
 end function
 
-catcher.updateSprites = function()
+catcher.updateSprites = function
 	self.place self.col, self.row, 1	
 	self.lights.x = self.x + (self.col-2) * 2
 	self.lights.y = self.y - 40
@@ -240,7 +240,7 @@ catcher.updateSprites = function()
 	end for	
 end function
 
-catcher.update = function()
+catcher.update = function
 	// works with gamepad, but sometimes misses an input:
 	//inp = round(key.axis("Horizontal"))
 	// keyboard only, but never misses:
@@ -281,7 +281,7 @@ Block.frameNum = 2
 Block.nextFrameTime = 0
 Block.frames = blockFrames
 
-Block.updateWalk = function()
+Block.updateWalk = function
 	if time < self.nextFrameTime then return
 	self.frameNum = self.frameNum + 1
 	if self.frameNum > 3 then
@@ -299,7 +299,7 @@ Block.updateWalk = function()
 	self.nextFrameTime = time + dtime
 end function
 
-Block.updateFall = function()
+Block.updateFall = function
 	self.row = self.row - 0.5
 	if self.z == 0 then
 		// Land when we hit our target row
@@ -318,7 +318,7 @@ Block.updateFall = function()
 	end if
 end function
 
-Block.update = function()
+Block.update = function
 	if self.state == kWalking then
 		self.updateWalk
 		if self.z == 1 and self.frameNum == 2 then
@@ -410,7 +410,7 @@ colorAtColRow = function(col, row)
 	return bin[col][row].tint
 end function
 
-checkSetsVertical = function()
+checkSetsVertical = function
 	result = {}
 	for col in range(0,4)
 		if bin[col].len < 3 then continue
@@ -435,7 +435,7 @@ checkSetsVertical = function()
 	return result
 end function
 
-checkSetsHorizontal = function()
+checkSetsHorizontal = function
 	result = {}
 	for row in range(0, 5)
 		setColor = colorAtColRow(0, row); setStart=0; setEnd=0
@@ -459,7 +459,7 @@ checkSetsHorizontal = function()
 	return result	
 end function
 
-checkSetsDiagonalUp = function()
+checkSetsDiagonalUp = function
 	result = {}
 	for row in range(0, 2)
 		for col in range(0, 2)
@@ -487,7 +487,7 @@ checkSetsDiagonalUp = function()
 	return result
 end function
 
-checkSetsDiagonalDown = function()
+checkSetsDiagonalDown = function
 	result = {}
 	for row in range(2, 4)
 		for col in range(0, 2)
@@ -515,7 +515,7 @@ checkSetsDiagonalDown = function()
 	return result
 end function
 
-checkForSets = function()
+checkForSets = function
 	blocksToClear = checkSetsVertical +
 	checkSetsHorizontal +
 	checkSetsDiagonalUp +
@@ -528,7 +528,7 @@ end function
 //============================================================
 score = 0
 lives = 3
-drawScore = function()
+drawScore = function
 	overlayGfx.fillRect 790,600,150,40, color.clear
 	s = ("00000" + score)[-6:]
 	overlayGfx.print s,800, 600, color.yellow, "large"
@@ -546,7 +546,7 @@ Heart.emptyImage = file.loadImage("pics/heart-empty.png")
 Heart.sortOrder = 1000
 Heart.throbStartTime = 0
 Heart.throbsLeft = 0
-Heart.update = function()
+Heart.update = function
 	if self.throbsLeft == 0 then return
 	t = (time - self.throbStartTime) / 0.5
 	if t > 1 then
@@ -562,7 +562,7 @@ Heart.throb = function(count)
 	self.throbStartTime = time
 end function
 
-prepareHearts = function()
+prepareHearts = function
 	globals.hearts = []
 	for i in range(0,2)
 		hearts.push new Heart
@@ -572,7 +572,7 @@ prepareHearts = function()
 	end for
 end function
 
-updateHearts = function()
+updateHearts = function
 	left = lives
 	for i in range(0,2)
 		if left > 0.9 then
@@ -588,9 +588,8 @@ updateHearts = function()
 		hearts[0].throbsLeft = 1
 	end if
 end function
-updateHearts
 
-loseLife = function()
+loseLife = function
 	globals.lives = lives - 1
 	hearts[floor(lives)].throb 3
 	if lives <= 1 then hearts[0].throbsLeft = -1  // (throb indefinitely)
@@ -600,7 +599,7 @@ end function
 level = 1
 blocksLeft = 0
 blocksInLevel = 30
-drawLevel = function()
+drawLevel = function
 	overlayGfx.fillRect 30, 560, 100, 20, color.clear
 	overlayGfx.drawRect 28, 558, 104, 24, color.blue, 2
 	s = "LEVEL " + level
@@ -613,7 +612,7 @@ progressBar.y = 570
 progressBar.x = 50
 progressBar.sortOrder = 1000
 progressBar.update = null
-updateProgress = function()
+updateProgress = function
 	prog = 1 - blocksLeft / blocksInLevel  // progress
 	if prog > 1 then prog = 1
 	w = 100 * prog  // (progress bar width)
@@ -634,7 +633,7 @@ addBlock = function(x, y, z=0)
 	return b
 end function
 
-startNextLevel = function()
+startNextLevel = function
 	globals.level = level + 1
 	globals.blocksInLevel = 10 + (level-1) * 5
 	globals.blocksLeft = blocksInLevel
@@ -668,14 +667,16 @@ startNextLevel = function()
 	if blocksToClear then clearSet blocksToClear
 end function
 
-pickNextBlockInterval = function()
+pickNextBlockInterval = function
 	// average time decreases as we approach the end of the level,
 	// and also with higher levels
 	avg = 1 + 1/level + 2 * blocksLeft/blocksInLevel
-	return avg + (rnd-0.5) * avg/2
+	result = avg + (rnd-0.5) * avg/2
+	if result < 0.25 then result = 0.25
+	return result
 end function
 
-waitForEnterKey = function()
+waitForEnterKey = function
 	while true
 		if key.available then
 			k = key.get.code
@@ -715,7 +716,7 @@ while true
 	nextBlockTime = 0
 	while lives > 0 or hearts[0].throbsLeft > 0
 		hurry = key.pressed("down")
-		if hurry then nextBlockTime = nextBlockTime - 0.05
+		//if hurry then nextBlockTime = nextBlockTime - 0.05
 		anyMoving = false
 		for b in display(4).sprites
 			b.update
